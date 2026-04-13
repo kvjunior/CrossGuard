@@ -1,0 +1,27 @@
+# ══════════════════════════════════════════════════════════════════════
+# CrossGuard — Python dependencies
+#
+# Tested on Python 3.10/3.11 with CUDA 11.8 / 12.1
+# Install:  pip install -r requirements.txt
+# ══════════════════════════════════════════════════════════════════════
+
+# ── Core ML framework ────────────────────────────────────────────────
+torch>=2.1.0,<2.5.0
+numpy>=1.24.0,<2.0.0
+
+# ── LLM backbone (DeepSeek-Coder-6.7B) ──────────────────────────────
+transformers>=4.36.0,<4.46.0
+peft>=0.7.0,<0.14.0            # LoRA / QLoRA adapters
+bitsandbytes>=0.41.0,<0.45.0   # 4-bit quantisation for QLoRA
+accelerate>=0.25.0,<0.35.0     # model parallelism / device_map
+
+# ── Evaluation and statistics ────────────────────────────────────────
+scikit-learn>=1.3.0,<1.6.0     # metrics, stratified splitting
+scipy>=1.11.0,<1.15.0          # required by scikit-learn
+
+# ── Configuration and serialisation ──────────────────────────────────
+pyyaml>=6.0,<7.0
+
+# ── Progress bars and visualisation ──────────────────────────────────
+tqdm>=4.66.0,<5.0.0
+matplotlib>=3.7.0,<4.0.0       # figures for paper (optional at runtime)

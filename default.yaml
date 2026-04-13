@@ -1,0 +1,137 @@
+# ══════════════════════════════════════════════════════════════════════
+# CrossGuard — default configuration
+#
+# Target: ACM Transactions on Software Engineering and Methodology
+# Paper:  SS4.3 (implementation) and SS4.1 (datasets)
+#
+# Every field here corresponds to a dataclass field in config.py.
+# Fields omitted from this file fall back to the dataclass defaults,
+# which are documented inline below for reference.
+# ══════════════════════════════════════════════════════════════════════
+
+# ── Agent configuration (SS3.2) ───────────────────────────────────────
+agent:
+  # LLM backbone
+  llm_model: "deepseek-ai/deepseek-coder-6.7b-instruct"
+  llm_max_length: 4096
+  agent_temperature: 0.1
+
+  # QLoRA adapter (SS3.5)
+  use_lora: true
+  lora_rank: 16           # paper SS3.5: "rank r = 16"
+  lora_alpha: 32          # paper SS3.5: "alpha = 32"
+  lora_dropout: 0.05
+
+  # Agent limits
+  max_agents_per_dapp: 20
+  local_analysis_max_tokens: 1024
+  cross_contract_max_tokens: 768
+  cross_reasoning_retries: 2
+
+  # Cross-contract reasoning
+  use_llm_cross_reasoning: true
+
+  # Fallback MLP (when LLM unavailable)
+  use_fallback_mlp: false
+  fallback_hidden_dim: 256
+
+# ── Protocol configuration (SS3.3) ────────────────────────────────────
+protocol:
+  num_reasoning_rounds: 3        # paper SS3.3: "T = 3"
+  vulnerability_score_threshold: 0.5
+  max_path_length: 5
+  use_iterative_refinement: true
+  convergence_threshold: 0.05    # theta = 0.05
+  track_message_similarity: true
+  similarity_method: "cosine"    # "cosine" or "jaccard"
+
+# ── Decomposer configuration (SS3.2) ─────────────────────────────────
+decomposer:
+  max_contracts_per_dapp: 50
+  # Six edge types (all enabled by default)
+  detect_inheritance: true
+  detect_external_calls: true
+  detect_interface_deps: true
+  detect_state_deps: true
+  detect_event_deps: true
+  detect_proxy_patterns: true
+  # Visualisation
+  generate_graph_figures: true
+  graph_layout: "spring"         # "spring" or "circular"
+
+# ── Training configuration (SS4.3) ────────────────────────────────────
+training:
+  batch_size: 4
+  gradient_accumulation_steps: 8  # effective batch = 32
+  gradient_clip_value: 1.0
+  weight_decay: 0.01
+  lr_warmup_ratio: 0.1           # paper SS3.5: "warmup ratio 0.1"
+
+  # LoRA fine-tuning
+  lora_finetune_epochs: 10
+  lora_finetune_lr: 2.0e-5       # paper SS4.3: "lr = 2e-5"
+  early_stopping_patience: 10
+
+# ── Baseline configuration (SS4.2) ────────────────────────────────────
+baselines:
+  # Ablation baselines (our own)
+  run_smartauditflow: true
+  run_mando_llm: true
+  # External tools
+  run_slither: true
+  run_mythril: true
+  slither_path: "slither"
+  mythril_path: "myth"
+  tool_timeout: 120              # seconds per contract
+
+# ── Dataset configuration (SS4.1) ─────────────────────────────────────
+data:
+  active_datasets: ["esc", "sms", "dappscan"]
+
+  # ESC: 9,742 contracts, 70/15/15 stratified (SS4.1)
+  esc_data_dir: "data/dataset1_esc/raw"
+  esc_train_split: 0.70
+  esc_val_split: 0.15
+  esc_test_split: 0.15
+
+  # SMS: 514,880 functions, 80/20 x 5 runs (SS4.1)
+  sms_data_dir: "data/dataset2_sms/raw"
+  sms_train_split: 0.80
+  sms_val_split: 0.0              # no validation set for SMS
+  sms_test_split: 0.20
+  sms_num_runs: 5                 # paper SS4.1: "five independent runs"
+
+  # DAppSCAN: 682 DApps, 70/15/15 stratified (SS4.1)
+  dappscan_source_dir: "data/dataset3_dappscan/source"
+  dappscan_bytecode_dir: "data/dataset3_dappscan/bytecode"
+  dappscan_train_split: 0.70
+  dappscan_val_split: 0.15
+  dappscan_test_split: 0.15
+
+# ── Path configuration ────────────────────────────────────────────────
+paths:
+  project_root: "."
+  results_dir: "results"
+  checkpoint_dir: "results/checkpoints"
+  figures_dir: "results/figures"
+  tables_dir: "results/tables"
+  logs_dir: "results/logs"
+  metrics_dir: "results/metrics"
+  prompts_dir: "prompts"
+
+# ── Reproducibility (SS4.3) ──────────────────────────────────────────
+reproducibility:
+  seed: 42
+  deterministic: true
+  num_bootstrap_samples: 1000    # paper SS4.4
+  num_permutation_tests: 10000   # paper SS4.4: "10,000 permutations"
+
+# ── Experiment orchestration ─────────────────────────────────────────
+experiment:
+  experiment_name: "crossguard_tosem"
+  run_baselines: true
+
+# ── Logging ──────────────────────────────────────────────────────────
+logging:
+  log_level: "info"
+  save_agent_messages: true
